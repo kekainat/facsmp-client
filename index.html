@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>FACMP Client — Оптимизированный клиент для facsmp.ru</title>
+  <!-- Google Fonts: энергичный заголовок + чистый основной шрифт -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Orbitron:wght@500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #03050a;
+      font-family: 'Inter', sans-serif;
+      color: #e0e8f0;
+      line-height: 1.5;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ===== Анимированный фон с частицами (canvas) ===== */
+    #particles-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content {
+      position: relative;
+      z-index: 2;
+      backdrop-filter: blur(2px);
+    }
+
+    /* ===== Типографика и цвета ===== */
+    h1, h2, h3, .logo-text, .gradient-text {
+      font-family: 'Orbitron', 'Inter', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #00e5ff 0%, #a855f7 50%, #f472b6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .accent {
+      color: #00e5ff;
+      text-shadow: 0 0 15px rgba(0, 229, 255, 0.6);
+    }
+
+    /* ===== Контейнер ===== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* ===== Хедер / Навигация ===== */
+    header {
+      padding: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+      backdrop-filter: blur(12px);
+      background: rgba(3, 5, 10, 0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo-img {
+      height: 48px;
+      width: 48px;
+      border-radius: 12px;
+      filter: drop-shadow(0 0 12px #00e5ffaa);
+      transition: transform 0.3s;
+    }
+    .logo-img:hover {
+      transform: scale(1.05);
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .nav-links a {
+      color: #cbd5e1;
+      text-decoration: none;
+      transition: 0.2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #00e5ff;
+      box-shadow: 0 0 10px #00e5ff;
+      transition: width 0.3s;
+    }
+    .nav-links a:hover {
+      color: #ffffff;
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* ===== Hero ===== */
+    .hero {
+      min-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem 1rem;
+      position: relative;
+    }
+    .hero-logo {
+      width: 140px;
+      height: 140px;
+      margin-bottom: 1.8rem;
+      filter: drop-shadow(0 0 45px rgba(168, 85, 247, 0.9));
+      animation: float 5s ease-in-out infinite;
+    }
+    @keyframes float {
+      0% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0); }
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 5.2rem);
+      font-weight: 900;
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+    .hero .subtitle {
+      font-size: 1.3rem;
+      color: #94a3b8;
+      margin-bottom: 2rem;
+      max-width: 650px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, #00e5ff, #7c3aed);
+      border: none;
+      padding: 1rem 2.8rem;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+      transition: all 0.3s ease;
+      margin: 0.5rem;
+      backdrop-filter: blur(10px);
+    }
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 45px #7c3aedcc, 0 10px 20px rgba(0,0,0,0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid #00e5ff;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+    }
+    .btn-outline:hover {
+      background: rgba(0, 229, 255, 0.1);
+      box-shadow: 0 0 30px #00e5ff;
+    }
+
+    /* ===== Секции ===== */
+    section {
+      padding: 5rem 0;
+      position: relative;
+    }
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      text-align: center;
+      margin-bottom: 3rem;
+      text-transform: uppercase;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+    }
+    .card {
+      background: rgba(15, 20, 30, 0.7);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 28px;
+      padding: 2.2rem 1.8rem;
+      transition: all 0.35s;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+    }
+    .card:hover {
+      transform: translateY(-8px);
+      border-color: #00e5ff;
+      box-shadow: 0 0 40px rgba(0, 229, 255, 0.3);
+    }
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.2rem;
+      color: #00e5ff;
+    }
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.8rem;
+    }
+    .card p {
+      color: #b0c4de;
+    }
+
+    /* ===== Установка ===== */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      max-width: 750px;
+      margin: 0 auto;
+    }
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.8rem;
+      background: rgba(20, 25, 40, 0.6);
+      backdrop-filter: blur(12px);
+      padding: 1.8rem 2rem;
+      border-radius: 24px;
+      border-left: 5px solid #00e5ff;
+    }
+    .step-number {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: #00e5ff;
+      background: rgba(0,229,255,0.1);
+      width: 55px;
+      height: 55px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 18px;
+    }
+
+    /* ===== Релизы ===== */
+    .releases-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .release-item {
+      background: rgba(10, 15, 25, 0.8);
+      backdrop-filter: blur(14px);
+      padding: 1.5rem 2rem;
+      border-radius: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      border: 1px solid rgba(255,255,255,0.05);
+      transition: 0.2s;
+    }
+    .release-item:hover {
+      border-color: #a855f7;
+      box-shadow: 0 0 30px rgba(168,85,247,0.3);
+    }
+    .release-info h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+    }
+    .release-meta {
+      font-size: 0.85rem;
+      color: #8899aa;
+    }
+    .badge {
+      background: #7c3aed;
+      padding: 0.2rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      margin-left: 0.5rem;
+    }
+    .download-link {
+      background: #00e5ff20;
+      border: 1px solid #00e5ff;
+      color: #00e5ff;
+      padding: 0.6rem 1.5rem;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.2s;
+    }
+    .download-link:hover {
+      background: #00e5ff;
+      color: #000;
+      box-shadow: 0 0 20px #00e5ff;
+    }
+
+    /* ===== Футер ===== */
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: #7f8ea0;
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: #00e5ff;
+      text-decoration: none;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 700px) {
+      .nav-links {
+        gap: 1.2rem;
+        font-size: 0.8rem;
+      }
+      .release-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Canvas для частиц -->
+  <canvas id="particles-canvas"></canvas>
+
+  <div class="content">
+    <!-- Навигация -->
+    <header>
+      <div class="container" style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+        <div class="logo-area">
+          <img src="https://cdn.easydonate.ru/images/logos/08/6a/086aa12a1f287c5efaa4735a3bdb5c810865f4f523f830851bb25d024b06c553.png" alt="FACMP Logo" class="logo-img">
+          <span style="font-weight: 700; font-size: 1.2rem; letter-spacing: 1px;">FACMP<span class="accent"> CLIENT</span></span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">Преимущества</a>
+          <a href="#install">Установка</a>
+          <a href="#releases">Релизы</a>
+          <a href="https://github.com/kekainat/facsmp-client/issues" target="_blank">Баг-трекер</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <img src="https://cdn.easydonate.ru/images/logos/08/6a/086aa12a1f287c5efaa4735a3bdb5c810865f4f523f830851bb25d024b06c553.png" alt="FACMP Client Logo" class="hero-logo">
+      <h1>
+        <span class="gradient-text">FACMP Client</span>
+      </h1>
+      <p class="subtitle">
+        Оптимизированный клиент для комфортной игры на <strong>facsmp.ru</strong>. 
+        Никаких фризов в Crystal PvP — только плавный геймплей.
+      </p>
+      <div>
+        <a href="#releases" class="btn">⚡ Скачать последнюю версию</a>
+        <a href="https://github.com/kekainat/facsmp-client/releases" target="_blank" class="btn btn-outline">📦 Все релизы</a>
+      </div>
+      <p style="margin-top: 1.5rem; color: #6b7c93;">IP сервера: <strong style="color:#fff; background:#7c3aed40; padding:0.2rem 1rem; border-radius:20px;">facsmp.ru</strong></p>
+    </section>
+
+    <!-- Преимущества -->
+    <section id="features">
+      <div class="container">
+        <h2 class="section-title"><span class="accent">🔥</span> Ключевые преимущества</h2>
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon">🚀</div>
+            <h3>Максимальная оптимизация</h3>
+            <p>Стабильный FPS даже при массовых взрывах кристаллов. Оптимизированный движок рендеринга убирает фризы.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">⚡</div>
+            <h3>Быстрая загрузка</h3>
+            <p>Время запуска сокращено в несколько раз. Тонкая настройка модов и выделения памяти.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🎯</div>
+            <h3>Минимальный инпут-лаг</h3>
+            <p>Мгновенный отклик управления для тренировки перебора тотемов и PvP-сценариев.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">🛠️</div>
+            <h3>Готовый конфиг</h3>
+            <p>Клиент преднастроен для корректного взаимодействия со всеми механиками facsmp.ru.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">📊</div>
+            <h3>Улучшенный интерфейс</h3>
+            <p>Индикаторы прочности брони, эффектов и удобный прицел — всё под рукой.</p>
+          </div>
+          <div class="card">
+            <div class="card-icon">✨</div>
+            <h3>Чистый экран</h3>
+            <p>Оптимизированные частицы и эффекты не забивают обзор во время битвы.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Установка -->
+    <section id="install">
+      <div class="container">
+        <h2 class="section-title"><span class="accent">💾</span> Установка</h2>
+        <div class="steps">
+          <div class="step">
+            <div class="step-number">1</div>
+            <div>
+              <h3>Скачайте сборку</h3>
+              <p>Загрузите актуальный архив во вкладке <a href="#releases" style="color:#00e5ff;">Релизы</a> или на GitHub.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">2</div>
+            <div>
+              <h3>Добавьте в Prism Launcher</h3>
+              <p>Откройте Prism Launcher, нажмите «Добавить экземпляр», затем «Импорт» и выберите скачанный архив.</p>
+            </div>
+          </div>
+          <div class="step">
+            <div class="step-number">3</div>
+            <div>
+              <h3>Запустите и играйте</h3>
+              <p>Выберите созданный профиль в лаунчере и подключитесь к серверу <strong>facsmp.ru</strong>.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Релизы (динамическая загрузка с GitHub) -->
+    <section id="releases">
+      <div class="container">
+        <h2 class="section-title"><span class="accent">📦</span> Релизы</h2>
+        <div id="releases-list" class="releases-container">
+          <!-- Заполняется через JavaScript -->
+          <div style="text-align:center; padding:2rem; color:#7f8ea0;">Загрузка списка релизов...</div>
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+          <a href="https://github.com/kekainat/facsmp-client/releases" target="_blank" class="btn-outline" style="padding:0.8rem 2rem; border-radius: 30px; text-decoration: none; color: #00e5ff; font-weight: 600;">Смотреть все на GitHub →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Обратная связь -->
+    <section style="padding: 3rem 0;">
+      <div class="container" style="text-align: center;">
+        <h2 style="font-size: 2rem; margin-bottom: 1rem;">🤝 Обратная связь</h2>
+        <p style="color: #b0c4de; max-width: 600px; margin: 0 auto 2rem;">
+          Нашли баг или есть идея? Создайте тикет на 
+          <a href="https://github.com/kekainat/facsmp-client/issues" target="_blank" style="color:#00e5ff;">GitHub Issues</a>.
+          Опишите проблему и характеристики ПК, если она связана с производительностью.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 FACMP Client — создано для сообщества <a href="https://facsmp.ru">facsmp.ru</a>. Все права защищены.</p>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- ЧАСТИЦЫ НА CANVAS ----------
+      const canvas = document.getElementById('particles-canvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.size = Math.random() * 2.2 + 0.8;
+          this.speedX = (Math.random() - 0.5) * 0.5;
+          this.speedY = (Math.random() - 0.5) * 0.5;
+          this.opacity = Math.random() * 0.6 + 0.2;
+          this.life = 1;
+        }
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          // Мерцание
+          this.life -= 0.002;
+          if (this.life <= 0 || this.x < 0 || this.x > width || this.y < 0 || this.y > height) {
+            this.reset();
+            this.life = 1;
+            if (this.x < 0) this.x = width;
+            if (this.x > width) this.x = 0;
+            if (this.y < 0) this.y = height;
+            if (this.y > height) this.y = 0;
+          }
+        }
+        draw(ctx) {
+          ctx.beginPath();
+          const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
+          gradient.addColorStop(0, `rgba(0, 229, 255, ${this.opacity * this.life})`);
+          gradient.addColorStop(0.7, `rgba(168, 85, 247, ${this.opacity * 0.3 * this.life})`);
+          gradient.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = gradient;
+          ctx.arc(this.x, this.y, this.size * 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      for (let i = 0; i < 80; i++) {
+        particles.push(new Particle());
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, width, height);
+        particles.forEach(p => {
+          p.update();
+          p.draw(ctx);
+        });
+        requestAnimationFrame(animateParticles);
+      }
+      animateParticles();
+
+      // ---------- ЗАГРУЗКА РЕЛИЗОВ С GITHUB ----------
+      const releasesContainer = document.getElementById('releases-list');
+      async function fetchReleases() {
+        try {
+          const response = await fetch('https://api.github.com/repos/kekainat/facsmp-client/releases?per_page=5');
+          if (!response.ok) throw new Error('GitHub API error');
+          const releases = await response.json();
+          if (releases.length === 0) {
+            releasesContainer.innerHTML = '<p style="text-align:center; color:#8899aa;">Релизы пока не добавлены.</p>';
+            return;
+          }
+          releasesContainer.innerHTML = releases.map(release => {
+            const date = new Date(release.published_at).toLocaleDateString('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' });
+            const tag = release.tag_name;
+            const name = release.name || tag;
+            const isPrerelease = release.prerelease;
+            // Ищем ассет (обычно zip/архив)
+            let downloadUrl = release.html_url;
+            if (release.assets && release.assets.length > 0) {
+              downloadUrl = release.assets[0].browser_download_url;
+            }
+            return `
+              <div class="release-item">
+                <div class="release-info">
+                  <h4>${escapeHTML(name)} ${isPrerelease ? '<span class="badge" style="background:#f472b6;">Pre-release</span>' : '<span class="badge">Stable</span>'}</h4>
+                  <div class="release-meta">📅 ${date} | Тег: ${escapeHTML(tag)}</div>
+                </div>
+                <a href="${downloadUrl}" target="_blank" class="download-link">⬇️ Скачать</a>
+              </div>
+            `;
+          }).join('');
+        } catch (error) {
+          console.error('Ошибка загрузки релизов:', error);
+          releasesContainer.innerHTML = `
+            <div style="text-align:center; padding:2rem; background: rgba(255,0,0,0.1); border-radius:20px;">
+              ⚠️ Не удалось загрузить релизы. Проверьте соединение или посетите <a href="https://github.com/kekainat/facsmp-client/releases" target="_blank" style="color:#00e5ff;">страницу релизов</a>.
+            </div>`;
+        }
+      }
+      function escapeHTML(str) {
+        const div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+      fetchReleases();
+    })();
+  </script>
+</body>
+</html>
