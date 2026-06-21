@@ -23,13 +23,17 @@
       --md-sys-color-on-surface-variant: #CAC4D0;
       --md-sys-color-outline: #938F99;
       --md-sys-color-background: #121212;
+      --elevation-0: none;
       --elevation-1: 0 1px 2px rgba(0,0,0,0.3), 0 2px 6px rgba(0,0,0,0.15);
       --elevation-2: 0 1px 2px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.15);
       --elevation-3: 0 4px 8px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2);
       --border-radius-card: 24px;
       --border-radius-button: 20px;
+      --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background-color: var(--md-sys-color-background);
       color: var(--md-sys-color-on-surface);
@@ -39,6 +43,8 @@
       position: relative;
       overflow-x: hidden;
     }
+
+    /* Детализированный фон с анимированной сеткой и градиентами */
     body::before {
       content: '';
       position: fixed;
@@ -46,111 +52,495 @@
       z-index: 0;
       pointer-events: none;
       background: 
-        radial-gradient(circle at 20% 40%, rgba(208, 188, 255, 0.07) 0%, transparent 45%),
-        radial-gradient(circle at 80% 20%, rgba(150, 120, 220, 0.05) 0%, transparent 50%),
-        radial-gradient(circle at 50% 80%, rgba(100, 80, 180, 0.04) 0%, transparent 55%),
-        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px),
-        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 4px);
+        radial-gradient(circle at 15% 35%, rgba(208, 188, 255, 0.08) 0%, transparent 45%),
+        radial-gradient(circle at 85% 25%, rgba(150, 120, 220, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 45% 75%, rgba(100, 80, 180, 0.05) 0%, transparent 55%),
+        repeating-linear-gradient(
+          0deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.02) 2px,
+          rgba(255,255,255,0.02) 4px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent,
+          transparent 2px,
+          rgba(255,255,255,0.02) 2px,
+          rgba(255,255,255,0.02) 4px
+        );
+      background-size: 100% 100%, 100% 100%, 100% 100%, 60px 60px, 60px 60px;
+      animation: bgShift 20s infinite alternate ease-in-out;
     }
+
+    @keyframes bgShift {
+      0% { background-position: 0% 0%, 0% 0%, 0% 0%, 0 0, 0 0; }
+      100% { background-position: 5% 5%, -3% 3%, 3% -3%, 5px 5px, 5px 5px; }
+    }
+
     .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
-    h1, h2, h3, .material-heading { font-family: 'Outfit', 'Inter', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
+
+    h1, h2, h3, .brand-name {
+      font-family: 'Outfit', 'Inter', sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
     h1 { font-size: clamp(3rem, 6vw, 4.8rem); font-weight: 800; line-height: 1.1; }
     h2 { font-size: 2.2rem; font-weight: 700; margin-bottom: 1.5rem; }
     .section-title {
-      text-align: center; margin-bottom: 3rem; color: var(--md-sys-color-on-surface);
-      display: inline-block; left: 50%; transform: translateX(-50%); position: relative;
-      padding-bottom: 0.5rem; border-bottom: 3px solid var(--md-sys-color-primary);
-      font-size: 2rem; font-weight: 700;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: var(--md-sys-color-on-surface);
+      display: inline-block;
+      left: 50%;
+      transform: translateX(-50%);
+      position: relative;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid var(--md-sys-color-primary);
+      font-size: 2rem;
+      font-weight: 700;
     }
+
+    /* Шапка с телеграм-каналом */
     header {
-      background-color: var(--md-sys-color-surface); box-shadow: var(--elevation-1);
-      position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--md-sys-color-outline);
-      backdrop-filter: blur(12px); background-color: rgba(28, 27, 31, 0.85);
+      background-color: var(--md-sys-color-surface);
+      box-shadow: var(--elevation-1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      border-bottom: 1px solid var(--md-sys-color-outline);
+      backdrop-filter: blur(12px);
+      background-color: rgba(28, 27, 31, 0.85);
+      transition: var(--transition-base);
     }
-    .header-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; }
-    .logo-area { display: flex; align-items: center; gap: 1rem; }
-    .logo-img { height: 44px; width: 44px; border-radius: 12px; transition: transform 0.2s; }
-    .logo-img:hover { transform: scale(1.03); }
-    .brand-name { font-size: 1.4rem; font-weight: 700; color: var(--md-sys-color-on-surface); letter-spacing: -0.3px; }
-    .brand-name span { color: var(--md-sys-color-primary); font-weight: 600; }
-    .nav-links { display: flex; gap: 2rem; font-weight: 500; font-size: 0.95rem; }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 0;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .logo-img {
+      height: 44px;
+      width: 44px;
+      border-radius: 14px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 0 0 2px rgba(208,188,255,0.3);
+    }
+    .logo-img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 0 4px rgba(208,188,255,0.6);
+    }
+    .brand-name {
+      font-size: 1.4rem;
+      color: var(--md-sys-color-on-surface);
+      letter-spacing: -0.3px;
+    }
+    .brand-name span {
+      color: var(--md-sys-color-primary);
+      font-weight: 600;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      font-weight: 500;
+      font-size: 0.95rem;
+      align-items: center;
+    }
     .nav-links a {
-      color: var(--md-sys-color-on-surface-variant); text-decoration: none;
-      padding: 0.5rem 0.8rem; border-radius: 8px; transition: 0.2s;
-      display: flex; align-items: center; gap: 0.3rem;
+      color: var(--md-sys-color-on-surface-variant);
+      text-decoration: none;
+      padding: 0.5rem 0.9rem;
+      border-radius: 10px;
+      transition: var(--transition-base);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
-    .nav-links a:hover { background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
-    .hero { padding: 6rem 1rem 5rem; text-align: center; background: linear-gradient(180deg, rgba(30, 27, 36, 0.9) 0%, transparent 100%); }
-    .hero-logo { width: 130px; height: 130px; margin-bottom: 1.8rem; border-radius: 32px; box-shadow: var(--elevation-2); }
-    .hero h1 { color: var(--md-sys-color-on-surface); margin-bottom: 1rem; font-size: clamp(3.5rem, 8vw, 5.5rem); }
-    .hero .subtitle { font-size: 1.2rem; color: var(--md-sys-color-on-surface-variant); max-width: 650px; margin: 0 auto 2.5rem; }
+    .nav-links a:hover {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+    }
+    .telegram-link {
+      background: rgba(208,188,255,0.1);
+      border: 1px solid var(--md-sys-color-outline);
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      color: var(--md-sys-color-primary) !important;
+      font-weight: 600;
+      transition: var(--transition-base);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .telegram-link:hover {
+      background: var(--md-sys-color-primary-container);
+      border-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary-container) !important;
+      box-shadow: 0 0 12px rgba(208,188,255,0.4);
+    }
+
+    /* Hero секция */
+    .hero {
+      padding: 6rem 1rem 5rem;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(30, 27, 36, 0.9) 0%, transparent 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      top: 10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(208,188,255,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-logo {
+      width: 130px;
+      height: 130px;
+      margin-bottom: 1.8rem;
+      border-radius: 32px;
+      box-shadow: var(--elevation-2), 0 0 30px rgba(208,188,255,0.3);
+      transition: transform 0.3s ease;
+    }
+    .hero-logo:hover {
+      transform: scale(1.02);
+    }
+    .hero h1 {
+      color: var(--md-sys-color-on-surface);
+      margin-bottom: 1rem;
+      font-size: clamp(3.5rem, 8vw, 5.5rem);
+      text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+    .hero .subtitle {
+      font-size: 1.2rem;
+      color: var(--md-sys-color-on-surface-variant);
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.6;
+    }
     .btn {
-      display: inline-flex; align-items: center; gap: 0.6rem;
-      background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-      border: none; padding: 0.9rem 2.4rem; border-radius: var(--border-radius-button);
-      font-weight: 600; font-size: 1.1rem; text-decoration: none; box-shadow: var(--elevation-1);
-      transition: all 0.25s; margin: 0.5rem; letter-spacing: 0.3px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border: none;
+      padding: 0.9rem 2.4rem;
+      border-radius: var(--border-radius-button);
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-decoration: none;
+      box-shadow: var(--elevation-1);
+      transition: var(--transition-base);
+      margin: 0.5rem;
+      letter-spacing: 0.3px;
+      position: relative;
+      overflow: hidden;
     }
-    .btn:hover { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); box-shadow: var(--elevation-2); transform: translateY(-2px); }
-    .btn-outline { background: transparent; border: 2px solid var(--md-sys-color-outline); color: var(--md-sys-color-primary); box-shadow: none; }
-    .btn-outline:hover { background-color: rgba(208, 188, 255, 0.08); border-color: var(--md-sys-color-primary); }
-    .server-ip { display: inline-block; margin-top: 1.8rem; background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); padding: 0.6rem 1.8rem; border-radius: 40px; font-weight: 600; font-size: 0.95rem; }
-    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    .btn:active::after {
+      width: 300px;
+      height: 300px;
+    }
+    .btn:hover {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--elevation-2), 0 0 15px rgba(208,188,255,0.4);
+      transform: translateY(-2px);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--md-sys-color-outline);
+      color: var(--md-sys-color-primary);
+      box-shadow: none;
+    }
+    .btn-outline:hover {
+      background-color: rgba(208, 188, 255, 0.08);
+      border-color: var(--md-sys-color-primary);
+      box-shadow: 0 0 10px rgba(208,188,255,0.3);
+    }
+    .server-ip {
+      display: inline-block;
+      margin-top: 1.8rem;
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+      padding: 0.6rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border: 1px solid var(--md-sys-color-outline);
+      transition: var(--transition-base);
+    }
+    .server-ip:hover {
+      background-color: var(--md-sys-color-secondary);
+      color: var(--md-sys-color-on-secondary);
+    }
+
+    /* Карточки преимуществ */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
     .feature-card {
-      background-color: var(--md-sys-color-surface); border-radius: var(--border-radius-card);
-      padding: 2rem 1.8rem; box-shadow: var(--elevation-1); transition: box-shadow 0.25s, transform 0.2s;
-      border: 1px solid var(--md-sys-color-outline); display: flex; flex-direction: column; gap: 0.8rem;
+      background-color: var(--md-sys-color-surface);
+      border-radius: var(--border-radius-card);
+      padding: 2rem 1.8rem;
+      box-shadow: var(--elevation-1);
+      transition: var(--transition-base), transform 0.2s ease;
+      border: 1px solid var(--md-sys-color-outline);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      position: relative;
+      overflow: hidden;
     }
-    .feature-card:hover { box-shadow: var(--elevation-2); transform: translateY(-5px); }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(to bottom, var(--md-sys-color-primary), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .feature-card:hover {
+      box-shadow: var(--elevation-3);
+      transform: translateY(-5px);
+    }
+    .feature-card:hover::before {
+      opacity: 1;
+    }
     .feature-icon {
-      width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
-      background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-      border-radius: 14px; font-size: 1.4rem; font-weight: 600;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      border-radius: 16px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
-    .feature-card h3 { font-size: 1.4rem; color: var(--md-sys-color-on-surface); }
-    .feature-card p { color: var(--md-sys-color-on-surface-variant); }
-    .steps { display: flex; flex-direction: column; gap: 1.5rem; max-width: 700px; margin: 0 auto; }
+    .feature-card h3 {
+      font-size: 1.4rem;
+      color: var(--md-sys-color-on-surface);
+    }
+    .feature-card p {
+      color: var(--md-sys-color-on-surface-variant);
+      line-height: 1.7;
+    }
+
+    /* Шаги установки */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      max-width: 700px;
+      margin: 0 auto;
+    }
     .step {
-      display: flex; align-items: flex-start; gap: 1.5rem; background-color: var(--md-sys-color-surface);
-      border-radius: var(--border-radius-card); padding: 1.5rem 2rem; box-shadow: var(--elevation-1);
+      display: flex;
+      align-items: flex-start;
+      gap: 1.5rem;
+      background-color: var(--md-sys-color-surface);
+      border-radius: var(--border-radius-card);
+      padding: 1.5rem 2rem;
+      box-shadow: var(--elevation-1);
       border-left: 5px solid var(--md-sys-color-primary);
+      transition: var(--transition-base);
+    }
+    .step:hover {
+      box-shadow: var(--elevation-2);
+      transform: translateX(4px);
     }
     .step-number {
-      font-size: 2rem; font-weight: 800; background-color: var(--md-sys-color-primary-container);
-      color: var(--md-sys-color-on-primary-container); width: 50px; height: 50px;
-      display: flex; align-items: center; justify-content: center; border-radius: 16px; flex-shrink: 0;
+      font-size: 2rem;
+      font-weight: 800;
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 16px;
+      flex-shrink: 0;
     }
-    .step h3 { margin-bottom: 0.3rem; }
+    .step h3 {
+      margin-bottom: 0.3rem;
+    }
+
+    /* Карточки релизов */
     .release-card {
-      background-color: var(--md-sys-color-surface); border-radius: var(--border-radius-card);
-      padding: 1.5rem 2rem; margin-bottom: 1rem; box-shadow: var(--elevation-1);
-      display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between;
-      border: 1px solid var(--md-sys-color-outline); transition: 0.2s; gap: 1rem;
+      background-color: var(--md-sys-color-surface);
+      border-radius: var(--border-radius-card);
+      padding: 1.5rem 2rem;
+      margin-bottom: 1rem;
+      box-shadow: var(--elevation-1);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      border: 1px solid var(--md-sys-color-outline);
+      transition: var(--transition-base);
+      gap: 1rem;
+      position: relative;
+      overflow: hidden;
     }
-    .release-card:hover { box-shadow: var(--elevation-2); }
-    .release-info h4 { font-size: 1.3rem; font-weight: 700; }
-    .release-meta { color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
-    .badge { background-color: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); padding: 0.2rem 1rem; border-radius: 20px; font-weight: 600; font-size: 0.8rem; margin-left: 0.8rem; }
-    .badge.latest { background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container); }
+    .release-card:first-of-type {
+      border: 2px solid var(--md-sys-color-primary);
+      box-shadow: 0 0 20px rgba(208,188,255,0.2);
+    }
+    .release-card:hover {
+      box-shadow: var(--elevation-2);
+      transform: translateY(-2px);
+    }
+    .release-info h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .release-meta {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+    .badge {
+      background-color: var(--md-sys-color-secondary-container);
+      color: var(--md-sys-color-on-secondary-container);
+      padding: 0.2rem 1rem;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+    .badge.latest {
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      animation: badgePulse 2s infinite;
+    }
+    @keyframes badgePulse {
+      0% { box-shadow: 0 0 0 0 rgba(208,188,255,0.5); }
+      50% { box-shadow: 0 0 0 6px rgba(208,188,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(208,188,255,0); }
+    }
     .download-btn {
-      background-color: var(--md-sys-color-primary-container); color: var(--md-sys-color-on-primary-container);
-      padding: 0.6rem 1.8rem; border-radius: 20px; text-decoration: none; font-weight: 600;
-      box-shadow: var(--elevation-1); transition: 0.2s; display: inline-flex; align-items: center; gap: 0.4rem;
+      background-color: var(--md-sys-color-primary-container);
+      color: var(--md-sys-color-on-primary-container);
+      padding: 0.6rem 1.8rem;
+      border-radius: 20px;
+      text-decoration: none;
+      font-weight: 600;
+      box-shadow: var(--elevation-1);
+      transition: var(--transition-base);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
       white-space: nowrap;
     }
-    .download-btn:hover { background-color: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); box-shadow: var(--elevation-2); }
-    .release-description { color: var(--md-sys-color-on-surface-variant); font-size: 0.95rem; line-height: 1.5; margin-top: 0.5rem; word-break: break-word; }
-    footer { background-color: var(--md-sys-color-surface); border-top: 1px solid var(--md-sys-color-outline); text-align: center; padding: 2rem; margin-top: 3rem; color: var(--md-sys-color-on-surface-variant); font-size: 0.9rem; }
-    footer a { color: var(--md-sys-color-primary); text-decoration: none; font-weight: 500; }
-    @media (max-width: 700px) {
-      .header-inner { flex-direction: column; gap: 1rem; }
-      .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
-      .release-card { flex-direction: column; align-items: flex-start; }
+    .download-btn:hover {
+      background-color: var(--md-sys-color-primary);
+      color: var(--md-sys-color-on-primary);
+      box-shadow: var(--elevation-2), 0 0 12px rgba(208,188,255,0.3);
     }
-    .text-secondary { color: var(--md-sys-color-on-surface-variant); }
-    .link { color: var(--md-sys-color-primary); text-decoration: none; font-weight: 500; }
-    .link:hover { text-decoration: underline; }
-    .divider { width: 60px; height: 3px; background: var(--md-sys-color-primary); margin: 1rem auto 2rem; }
+    .release-description {
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-top: 0.5rem;
+      word-break: break-word;
+    }
+
+    /* Футер */
+    footer {
+      background-color: var(--md-sys-color-surface);
+      border-top: 1px solid var(--md-sys-color-outline);
+      text-align: center;
+      padding: 2rem;
+      margin-top: 3rem;
+      color: var(--md-sys-color-on-surface-variant);
+      font-size: 0.9rem;
+    }
+    footer a {
+      color: var(--md-sys-color-primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* Адаптивность */
+    @media (max-width: 700px) {
+      .header-inner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+      .nav-links {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .release-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .hero h1 {
+        font-size: 2.8rem;
+      }
+    }
+
+    .text-secondary {
+      color: var(--md-sys-color-on-surface-variant);
+    }
+    .link {
+      color: var(--md-sys-color-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition-base);
+    }
+    .link:hover {
+      text-decoration: underline;
+      color: #EADDFF;
+    }
+    .divider {
+      width: 60px;
+      height: 3px;
+      background: var(--md-sys-color-primary);
+      margin: 1rem auto 2rem;
+      border-radius: 2px;
+    }
   </style>
 </head>
 <body>
@@ -165,6 +555,12 @@
         <a href="#install">Установка</a>
         <a href="#releases">Релизы</a>
         <a href="https://github.com/kekainat/facsmp-client/issues" target="_blank">Баг-трекер</a>
+        <a href="https://t.me/faclient" target="_blank" class="telegram-link">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.96 6.506-1.356 8.626-.168.897-.5 1.196-.82 1.229-.697.064-1.226-.46-1.901-.903-1.056-.691-1.653-1.122-2.678-1.797-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.975 3.307-3.229.007-.032.014-.15-.056-.212-.07-.062-.174-.041-.248-.024-.106.024-1.794 1.14-5.063 3.346-.48.33-.914.49-1.303.481-.429-.009-1.253-.242-1.866-.442-.752-.244-1.349-.373-1.297-.787.027-.216.325-.438.894-.664 3.499-1.524 5.83-2.529 6.995-3.015 3.333-1.386 4.025-1.627 4.476-1.635.099-.002.32.023.463.14.12.098.153.232.17.34.016.108.036.35.02.54z"/>
+          </svg>
+          Telegram
+        </a>
       </nav>
     </div>
   </header>
@@ -255,7 +651,9 @@
       <div class="container">
         <h2 class="section-title">Релизы</h2>
         <div id="releases-list" style="display: flex; flex-direction: column; gap: 1rem;">
-          <div style="text-align: center; color: var(--md-sys-color-on-surface-variant); padding: 2rem;">Загрузка списка релизов...</div>
+          <div style="text-align: center; color: var(--md-sys-color-on-surface-variant); padding: 2rem;">
+            Загрузка списка релизов...
+          </div>
         </div>
       </div>
     </section>
@@ -294,7 +692,7 @@
             return;
           }
 
-          // Сортируем по дате публикации (сначала новые), GitHub API и так возвращает в порядке убывания
+          // Сортировка по дате (сначала новые)
           const sortedReleases = releases.sort((a, b) => new Date(b.published_at) - new Date(a.published_at));
 
           let html = '';
@@ -309,21 +707,19 @@
             const isLatest = index === 0;
             const isPrerelease = release.prerelease;
             
-            // Определяем ссылку для скачивания
-            let downloadUrl = release.html_url; // fallback
+            let downloadUrl = release.html_url;
             if (release.assets && release.assets.length > 0) {
               downloadUrl = release.assets[0].browser_download_url;
             }
 
-            const badgeClasses = isLatest ? 'badge latest' : 'badge';
             const badgeText = isLatest ? 'Последняя' : (isPrerelease ? 'Pre-release' : '');
-            const cardStyle = isLatest ? 'border: 2px solid var(--md-sys-color-primary);' : '';
+            const badgeClass = isLatest ? 'badge latest' : 'badge';
 
             html += `
-              <div class="release-card" style="${cardStyle}">
+              <div class="release-card">
                 <div style="flex: 1;">
                   <div class="release-info">
-                    <h4>${escapeHTML(name)} ${badgeText ? `<span class="${badgeClasses}">${badgeText}</span>` : ''}</h4>
+                    <h4>${escapeHTML(name)} ${badgeText ? `<span class="${badgeClass}">${badgeText}</span>` : ''}</h4>
                     <div class="release-meta">${date}</div>
                   </div>
                   ${body ? `<div class="release-description">${body}</div>` : ''}
